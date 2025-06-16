@@ -1,18 +1,19 @@
 {
+  "name": "project-management-app",
+  "version": "1.0.0",
+  "description": "Fullstack Project Management App",
+  "main": "server/index.js",
   "engines": {
     "node": "20.15.1"
   },
-  "name": "server",
-  "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js",
+    "build": "cd client && npm install && npm run build",
+    "postbuild": "cp -r client/build server/build"
   },
   "keywords": [],
-  "author": "",
+  "author": "Durgesh Maurya",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
