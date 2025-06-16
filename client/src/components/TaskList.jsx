@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "../axios";
 import { toast } from "react-toastify";
 
@@ -6,13 +6,13 @@ function TaskList({ projectId }) {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
-  const [deadline, setDeadline] = useState(""); // ✅ New state
+  const [deadline, setDeadline] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
 
   const token = localStorage.getItem("authToken");
 
-  // ✅ Fetch tasks for this project
-  const fetchTasks = async () => {
+  // ✅ fetchTasks wrapped in useCallback to avoid linting warnings
+  const fetchTasks = useCallback(async () => {
     try {
       const res = await axios.get(`/tasks/${projectId}`, {
         headers: { Authorization: token },
@@ -21,11 +21,12 @@ function TaskList({ projectId }) {
     } catch (err) {
       toast.error("Failed to fetch tasks");
     }
-  };
+  }, [projectId, token]);
 
+  // ✅ useEffect with fetchTasks dependency
   useEffect(() => {
     fetchTasks();
-  }, [projectId]);
+  }, [fetchTasks]);
 
   // ✅ Create new task
   const handleCreate = async (e) => {
@@ -35,13 +36,13 @@ function TaskList({ projectId }) {
     try {
       await axios.post(
         "/tasks",
-        { title, projectId, assignedTo, deadline }, // ✅ Send deadline
+        { title, projectId, assignedTo, deadline },
         { headers: { Authorization: token } }
       );
       toast.success("Task created");
       setTitle("");
       setAssignedTo("");
-      setDeadline(""); // ✅ Clear after create
+      setDeadline("");
       fetchTasks();
     } catch (err) {
       toast.error(err.response?.data?.message || "Error creating task");

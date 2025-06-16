@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "../axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +10,15 @@ function Login() {
     password: "",
   });
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // ✅ useCallback to optimize input handling
+  const handleChange = useCallback((e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  }, []);
 
+  // ✅ Login submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -20,20 +26,20 @@ function Login() {
       const res = await axios.post("/login", formData);
       const { token, user } = res.data;
 
-      // Save token/user
+      // ✅ Save token & user
       localStorage.setItem("authToken", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      toast.success("Login successful");
+      toast.success("✅ Login successful!");
       navigate("/dashboard");
     } catch (err) {
       const msg = err.response?.data?.message;
 
       if (msg === "Invalid email or password") {
         toast.error("User not found. Please register first.");
-        navigate("/"); // Redirect to register page
+        navigate("/"); // Go to register
       } else {
-        toast.error(msg || "Login failed");
+        toast.error(msg || "❌ Login failed");
       }
     }
   };
@@ -53,6 +59,7 @@ function Login() {
           onChange={handleChange}
           placeholder="Email"
           className="w-full px-4 py-2 border mb-4 rounded"
+          required
         />
         <input
           type="password"
@@ -61,6 +68,7 @@ function Login() {
           onChange={handleChange}
           placeholder="Password"
           className="w-full px-4 py-2 border mb-4 rounded"
+          required
         />
 
         <button

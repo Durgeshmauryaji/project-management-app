@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../axios";
 import TaskList from "../components/TaskList";
@@ -13,8 +13,8 @@ function ProjectDetail() {
 
   const token = localStorage.getItem("authToken");
 
-  // ✅ Fetch project details
-  const fetchProject = async () => {
+  // ✅ useCallback for fetchProject
+  const fetchProject = useCallback(async () => {
     try {
       const res = await axios.get(`/projects/${id}`, {
         headers: { Authorization: token },
@@ -26,21 +26,26 @@ function ProjectDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, token]);
 
-  // ✅ Fetch users (corrected endpoint)
-  const fetchUsers = async () => {
+  // ✅ useCallback for fetchUsers
+  const fetchUsers = useCallback(async () => {
     try {
       const res = await axios.get("/users", {
         headers: { Authorization: token },
       });
-      console.log("✅ Users fetched:", res.data);
       setUsers(res.data);
     } catch (err) {
       console.error("❌ Failed to fetch users:", err.response?.data || err.message);
       toast.error("Failed to fetch users");
     }
-  };
+  }, [token]);
+
+  // ✅ Fetch data on mount
+  useEffect(() => {
+    fetchProject();
+    fetchUsers();
+  }, [fetchProject, fetchUsers]);
 
   // ✅ Add member to project
   const handleAddMember = async () => {
@@ -60,11 +65,6 @@ function ProjectDetail() {
       toast.error(err.response?.data?.message || "Failed to add member");
     }
   };
-
-  useEffect(() => {
-    fetchProject();
-    fetchUsers();
-  }, [id]);
 
   if (loading) return <p className="p-6">Loading...</p>;
   if (!project) return <p className="p-6 text-red-600">❌ Project not found</p>;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "../axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -20,18 +20,24 @@ function Register() {
     }
   }, [navigate]);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // ✅ Stable handler using useCallback
+  const handleChange = useCallback((e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post("/register", formData);
-      toast.success("Registered successfully!");
+      toast.success("🎉 Registered successfully!");
       setFormData({ name: "", email: "", password: "" });
-      navigate("/login"); // ✅ go to login after registration
+      navigate("/login");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      console.error("Registration error:", err);
+      toast.error(err.response?.data?.message || "❌ Registration failed");
     }
   };
 
@@ -50,6 +56,7 @@ function Register() {
           onChange={handleChange}
           placeholder="Name"
           className="w-full px-4 py-2 border mb-4 rounded"
+          required
         />
         <input
           type="email"
@@ -58,6 +65,7 @@ function Register() {
           onChange={handleChange}
           placeholder="Email"
           className="w-full px-4 py-2 border mb-4 rounded"
+          required
         />
         <input
           type="password"
@@ -66,6 +74,7 @@ function Register() {
           onChange={handleChange}
           placeholder="Password"
           className="w-full px-4 py-2 border mb-4 rounded"
+          required
         />
 
         <button
