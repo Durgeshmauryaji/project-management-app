@@ -1,16 +1,15 @@
 {
   "name": "project-management-app",
   "version": "1.0.0",
-  "description": "Fullstack Project Management App",
+  "description": "Fullstack Project Management App - Backend",
   "main": "server/index.js",
   "engines": {
     "node": "20.15.1"
   },
   "scripts": {
-  "start": "react-scripts start",
-  "build": "react-scripts build",
-  "postinstall": "chmod +x ./node_modules/.bin/react-scripts"
-}git add .,
+    "start": "node server/index.js",
+    "heroku-postbuild": "cd client && npm install && npm run build"
+  },
   "keywords": [],
   "author": "Durgesh Maurya",
   "license": "ISC",
